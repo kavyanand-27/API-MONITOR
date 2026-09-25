@@ -445,13 +445,13 @@ input, select, textarea {
 }
 
 .stat-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 1.2rem;
     flex-shrink: 0;
 }
 
@@ -471,7 +471,7 @@ body.dark-mode .stat-icon.uptime { background: rgba(2, 132, 199, 0.12); }
 }
 
 .stat-value {
-    font-size: 1.4rem;
+    font-size: 1.75rem;
     font-weight: 700;
     line-height: 1.2;
 }
@@ -483,9 +483,10 @@ body.dark-mode .stat-icon.uptime { background: rgba(2, 132, 199, 0.12); }
 }
 
 .stat-label {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     font-weight: 500;
+    margin-top: 2px;
 }
 
 /* ========== CARDS ========== */
@@ -506,7 +507,7 @@ body.dark-mode .stat-icon.uptime { background: rgba(2, 132, 199, 0.12); }
 }
 
 .card-header h3 {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -574,8 +575,8 @@ body.dark-mode .stat-icon.uptime { background: rgba(2, 132, 199, 0.12); }
 }
 
 .check-status-dot {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -587,7 +588,7 @@ body.dark-mode .stat-icon.uptime { background: rgba(2, 132, 199, 0.12); }
 .check-info { flex: 1; min-width: 0; }
 
 .check-name {
-    font-size: 0.83rem;
+    font-size: 0.95rem;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -595,13 +596,13 @@ body.dark-mode .stat-icon.uptime { background: rgba(2, 132, 199, 0.12); }
 }
 
 .check-meta {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 .check-time {
-    font-size: 0.83rem;
+    font-size: 0.95rem;
     font-weight: 700;
     white-space: nowrap;
 }
