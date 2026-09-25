@@ -4,71 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="API Monitoring and Performance Analysis Dashboard - Monitor API health, response times, and performance metrics in real-time.">
-    <title>API Monitor — Performance Analysis Dashboard</title>
+    <title>API Monitor — Performance Analytics Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- ===== SIDEBAR ===== -->
+    <!-- ===== SIDEBAR (Icon-only with Pill Active States) ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-satellite-dish"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>API Monitor</h1>
-                    <span>Performance Dashboard</span>
-                </div>
+            <div class="logo-mark" title="API Monitor">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <path d="M14 2C10.5 2 7 4.5 7 8.5C7 13.5 14 14.5 14 19.5C14 23.5 10.5 26 7 26" stroke="url(#logo-grad-1)" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M14 2C17.5 2 21 4.5 21 8.5C21 13.5 14 14.5 14 19.5C14 23.5 17.5 26 21 26" stroke="url(#logo-grad-2)" stroke-width="4" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="logo-grad-1" x1="7" y1="2" x2="14" y2="26" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FF5E62"/>
+                            <stop offset="1" stop-color="#FF9966"/>
+                        </linearGradient>
+                        <linearGradient id="logo-grad-2" x1="14" y1="2" x2="21" y2="26" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FF5E62"/>
+                            <stop offset="1" stop-color="#D946EF"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
         </div>
 
         <nav class="sidebar-nav">
             <ul>
                 <li>
-                    <a href="#" class="nav-link active" data-page="dashboard">
-                        <i class="fas fa-th-large"></i>
-                        <span>Dashboard</span>
+                    <a href="#" class="nav-link active" data-page="dashboard" data-tooltip="Dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="active-dot"></span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link" data-page="apis">
-                        <i class="fas fa-plug"></i>
-                        <span>APIs</span>
+                    <a href="#" class="nav-link" data-page="apis" data-tooltip="API Management">
+                        <i class="fas fa-user-shield"></i>
+                        <span class="active-dot"></span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link" data-page="monitor">
-                        <i class="fas fa-heartbeat"></i>
-                        <span>Monitor</span>
+                    <a href="#" class="nav-link" data-page="monitor" data-tooltip="Live Monitor">
+                        <i class="fas fa-chart-pie"></i>
+                        <span class="active-dot"></span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link" data-page="history">
-                        <i class="fas fa-clock-rotate-left"></i>
-                        <span>History</span>
+                    <a href="#" class="nav-link" data-page="history" data-tooltip="Monitoring History">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="active-dot"></span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link" data-page="analytics">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Analytics</span>
+                    <a href="#" class="nav-link" data-page="analytics" data-tooltip="Analytics & Stats">
+                        <i class="fas fa-globe"></i>
+                        <span class="active-dot"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" id="nav-btn-check-all" data-tooltip="Check All APIs">
+                        <i class="fas fa-sync-alt"></i>
                     </a>
                 </li>
             </ul>
         </nav>
 
         <div class="sidebar-footer">
-            <div class="system-status">
-                <div class="status-dot online"></div>
-                <span>System Online</span>
+            <!-- Stylized 3D ring icon decoration -->
+            <div class="sidebar-swirl-icon" title="High Reliability">
+                <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+                    <circle cx="17" cy="17" r="11" stroke="url(#swirl-grad)" stroke-width="4.5" stroke-dasharray="24 10" stroke-linecap="round"/>
+                    <circle cx="17" cy="17" r="5" fill="#FF9966"/>
+                    <defs>
+                        <linearGradient id="swirl-grad" x1="6" y1="6" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FF5E62"/>
+                            <stop offset="0.5" stop-color="#D946EF"/>
+                            <stop offset="1" stop-color="#8B5CF6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
-            <button class="theme-toggle" id="theme-toggle" title="Toggle Dark Mode">
+
+            <!-- Profile Avatar with notification badge -->
+            <div class="user-avatar-wrap" title="Admin Workspace">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Avatar" class="user-avatar">
+                <span class="avatar-badge">6</span>
+            </div>
+
+            <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
                 <i class="fas fa-moon" id="theme-icon"></i>
             </button>
         </div>
@@ -80,7 +109,7 @@
             <i class="fas fa-bars"></i>
         </button>
         <div class="mobile-logo">
-            <i class="fas fa-satellite-dish"></i>
+            <i class="fas fa-bolt" style="color: #ff5e62;"></i>
             <span>API Monitor</span>
         </div>
         <div class="mobile-actions">
@@ -96,129 +125,213 @@
     <!-- ===== OVERLAY ===== -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- ===== MAIN CONTENT CANVAS ===== -->
     <main class="main-content" id="main-content">
 
-        <!-- ~~~~~~~ DASHBOARD PAGE ~~~~~~~ -->
-        <section class="page active" id="page-dashboard">
-            <div class="page-header">
-                <div>
-                    <h2 class="page-title">Dashboard</h2>
-                    <p class="page-subtitle">Overview of all monitored APIs</p>
+        <!-- TOP BAR (Matches Reference Header) -->
+        <div class="top-nav-bar">
+            <div class="top-nav-left">
+                <h1 class="page-main-heading" id="dynamic-page-title">Analytics</h1>
+                
+                <!-- Environment Dropdown Pill -->
+                <div class="env-selector-pill" id="env-selector-btn">
+                    <span class="env-icon"><i class="fab fa-hubspot"></i></span>
+                    <span class="env-text">api.production.network</span>
+                    <i class="fas fa-chevron-down pill-arrow"></i>
                 </div>
-                <div class="page-actions">
-                    <button class="btn btn-primary" id="btn-check-all-dashboard">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Check All APIs</span>
+            </div>
+
+            <div class="top-nav-right">
+                <!-- Search Input Pill -->
+                <div class="search-pill">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="global-search-input" placeholder="Search APIs, methods, routes...">
+                </div>
+
+                <!-- Add/Check Action Button -->
+                <button class="btn btn-dark-pill" id="btn-quick-new-api">
+                    <i class="fas fa-plus"></i>
+                    <span>New API</span>
+                </button>
+
+                <!-- Action icons -->
+                <button class="icon-circle-btn" id="btn-fullscreen-toggle" title="Toggle Fullscreen">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </button>
+                <div class="notification-wrap">
+                    <button class="icon-circle-btn" title="Notifications">
+                        <i class="far fa-bell"></i>
                     </button>
+                    <span class="notification-badge" id="alert-counter-badge">6</span>
                 </div>
             </div>
+        </div>
 
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card" id="stat-total">
-                    <div class="stat-icon total">
-                        <i class="fas fa-plug"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="stat-total-value">0</span>
-                        <span class="stat-label">Total APIs</span>
-                    </div>
-                </div>
-                <div class="stat-card" id="stat-healthy">
-                    <div class="stat-icon healthy">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="stat-healthy-value">0</span>
-                        <span class="stat-label">Healthy</span>
-                    </div>
-                </div>
-                <div class="stat-card" id="stat-slow">
-                    <div class="stat-icon slow">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="stat-slow-value">0</span>
-                        <span class="stat-label">Slow</span>
-                    </div>
-                </div>
-                <div class="stat-card" id="stat-failed">
-                    <div class="stat-icon failed">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="stat-failed-value">0</span>
-                        <span class="stat-label">Failed</span>
-                    </div>
-                </div>
-                <div class="stat-card" id="stat-avg-response">
-                    <div class="stat-icon avg">
-                        <i class="fas fa-tachometer-alt"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="stat-avg-value">0 <small>ms</small></span>
-                        <span class="stat-label">Avg Response</span>
-                    </div>
-                </div>
-                <div class="stat-card" id="stat-uptime">
-                    <div class="stat-icon uptime">
-                        <i class="fas fa-signal"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="stat-uptime-value">0<small>%</small></span>
-                        <span class="stat-label">Uptime</span>
-                    </div>
-                </div>
-            </div>
+        <!-- ~~~~~~~ DASHBOARD PAGE (Matches Screenshot) ~~~~~~~ -->
+        <section class="page active" id="page-dashboard">
+            <div class="ref-dashboard-container">
 
-            <!-- Dashboard Content Grid -->
-            <div class="dashboard-grid">
-                <!-- Recent Checks -->
-                <div class="card recent-checks-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-history"></i> Recent Checks</h3>
-                        <a href="#" class="view-all-link" data-page="history">View All <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                    <div class="card-body">
-                        <div class="recent-checks-list" id="recent-checks-list">
-                            <!-- Populated by JS -->
-                        </div>
-                        <div class="empty-state" id="recent-empty" style="display:none;">
-                            <i class="fas fa-inbox"></i>
-                            <p>No recent checks yet</p>
-                            <span>Start monitoring your APIs to see results here</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- LEFT / MAIN COLUMN -->
+                <div class="ref-main-col">
 
-                <!-- API Status Overview -->
-                <div class="card status-overview-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-server"></i> API Status</h3>
-                        <a href="#" class="view-all-link" data-page="apis">Manage <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                    <div class="card-body">
-                        <div class="api-status-list" id="api-status-list">
-                            <!-- Populated by JS -->
+                    <!-- HERO CARDS ROW -->
+                    <div class="ref-hero-row">
+                        <!-- Hero Card 1: Sunset Gradient Total Requests Card -->
+                        <div class="ref-card gradient-hero-card" id="hero-requests-card">
+                            <div class="hero-card-header">
+                                <span class="hero-label">Total API Calls</span>
+                                <button class="card-dots-btn" title="Options"><i class="fas fa-ellipsis-h"></i></button>
+                            </div>
+                            <div class="hero-main-stat" id="hero-total-number">23.0000K</div>
+
+                            <!-- Wavy line chart canvas -->
+                            <div class="hero-wave-chart-wrap">
+                                <canvas id="hero-wave-canvas"></canvas>
+                            </div>
+
+                            <!-- Tri-column summary -->
+                            <div class="hero-stats-footer">
+                                <div class="hero-footer-col">
+                                    <span class="col-title">Healthy</span>
+                                    <span class="col-val" id="hero-healthy-pct">%78</span>
+                                </div>
+                                <div class="hero-footer-col">
+                                    <span class="col-title">Slow</span>
+                                    <span class="col-val" id="hero-slow-pct">%16</span>
+                                </div>
+                                <div class="hero-footer-col">
+                                    <span class="col-title">Failed</span>
+                                    <span class="col-val" id="hero-failed-pct">%6</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="empty-state" id="status-empty" style="display:none;">
-                            <i class="fas fa-plus-circle"></i>
-                            <p>No APIs registered</p>
-                            <span>Add your first API to get started</span>
+
+                        <!-- Hero Card 2: Health Breakdown Donut Card -->
+                        <div class="ref-card donut-breakdown-card">
+                            <div class="hero-card-header">
+                                <span class="hero-label-dark">Pending & Health</span>
+                                <button class="card-dots-btn" title="Options"><i class="fas fa-ellipsis-h"></i></button>
+                            </div>
+
+                            <div class="donut-card-body">
+                                <div class="donut-left-col">
+                                    <div class="donut-big-stat" id="donut-uptime-number">98.4<small>%</small></div>
+                                    <div class="donut-legend">
+                                        <div class="legend-row">
+                                            <span class="legend-dot healthy-dot"></span>
+                                            <span class="legend-name">Healthy</span>
+                                        </div>
+                                        <div class="legend-val" id="legend-healthy-val">%80</div>
+
+                                        <div class="legend-row" style="margin-top: 10px;">
+                                            <span class="legend-dot slow-dot"></span>
+                                            <span class="legend-name">Slow</span>
+                                        </div>
+                                        <div class="legend-val" id="legend-slow-val">%15</div>
+
+                                        <div class="legend-row" style="margin-top: 10px;">
+                                            <span class="legend-dot failed-dot"></span>
+                                            <span class="legend-name">Failed</span>
+                                        </div>
+                                        <div class="legend-val" id="legend-failed-val">%5</div>
+                                    </div>
+                                </div>
+
+                                <div class="donut-chart-wrap">
+                                    <canvas id="health-donut-canvas"></canvas>
+                                    <div class="donut-center-decor">
+                                        <div class="donut-cross-icon">
+                                            <i class="fas fa-heartbeat"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- BOTTOM SECTION: TABS & INTERACTIVE ACTIVITY LIST -->
+                    <div class="ref-activity-section">
+                        <div class="activity-tabs-row">
+                            <div class="activity-tabs">
+                                <button class="tab-btn active" data-tab="activity">API Activity</button>
+                                <button class="tab-btn" data-tab="endpoints">Endpoints (<span id="tab-endpoint-count">5</span>)</button>
+                                <button class="tab-btn" data-tab="alerts">Incidents</button>
+                            </div>
+                            <div class="activity-actions">
+                                <button class="btn btn-sm btn-outline" id="btn-check-all-dashboard">
+                                    <i class="fas fa-sync-alt"></i> Run All Checks
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Activity List (Interactive Rows) -->
+                        <div class="activity-list-container" id="activity-rows-wrap">
+                            <!-- Populated dynamically by JS matching screenshot design -->
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- Quick Response Time Chart -->
-                <div class="card chart-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-chart-area"></i> Response Times</h3>
+                <!-- RIGHT COLUMN (Cards Stack) -->
+                <div class="ref-side-col">
+
+                    <!-- Right Card 1: Latency Mini Card -->
+                    <div class="ref-card mini-metric-card">
+                        <div class="mini-metric-left">
+                            <div class="metric-big-num" id="side-avg-latency">142 <small>ms</small></div>
+                            <div class="metric-sub-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        </div>
+                        <div class="mini-metric-right">
+                            <div class="metric-title">Average Latency</div>
+                            <div class="metric-progress-track">
+                                <div class="metric-progress-fill coral-grad" id="latency-progress-fill" style="width: 32%;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <canvas id="dashboard-response-chart"></canvas>
+
+                    <!-- Right Card 2: Latency & Traffic Distribution Card (Post Stats in Ref) -->
+                    <div class="ref-card stats-bars-card">
+                        <div class="hero-card-header">
+                            <span class="hero-label-dark">Performance Stats</span>
+                            <button class="card-dots-btn" title="Options"><i class="fas fa-ellipsis-h"></i></button>
+                        </div>
+
+                        <!-- Bar chart with highlight star -->
+                        <div class="bars-chart-container">
+                            <canvas id="weekly-bars-canvas"></canvas>
+                        </div>
+
+                        <!-- Completed Checks Box -->
+                        <div class="completed-checks-box">
+                            <div class="completed-box-left">
+                                <div class="completed-icon-box">
+                                    <i class="far fa-check-circle"></i>
+                                </div>
+                                <div class="completed-text-wrap">
+                                    <span class="completed-title">Successful Checks</span>
+                                    <span class="completed-sub">Current 24h Period</span>
+                                </div>
+                            </div>
+                            <div class="completed-number" id="side-completed-count">874</div>
+                        </div>
                     </div>
+
+                    <!-- Right Card 3: Uptime Reliability Mini Card -->
+                    <div class="ref-card mini-metric-card">
+                        <div class="mini-metric-left">
+                            <div class="metric-big-num" id="side-uptime-pct">99.8<small>%</small></div>
+                            <div class="metric-sub-icon"><i class="far fa-thumbs-up"></i></div>
+                        </div>
+                        <div class="mini-metric-right">
+                            <div class="metric-title">Uptime Reliability</div>
+                            <div class="metric-progress-track">
+                                <div class="metric-progress-fill dark-fill" id="uptime-progress-fill" style="width: 98%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
         </section>
 
@@ -227,7 +340,7 @@
             <div class="page-header">
                 <div>
                     <h2 class="page-title">API Management</h2>
-                    <p class="page-subtitle">Register and manage your APIs</p>
+                    <p class="page-subtitle">Register and manage your endpoints</p>
                 </div>
             </div>
 
@@ -312,8 +425,8 @@
         <section class="page" id="page-monitor">
             <div class="page-header">
                 <div>
-                    <h2 class="page-title">API Monitor</h2>
-                    <p class="page-subtitle">Check API health and response times</p>
+                    <h2 class="page-title">Live API Monitor</h2>
+                    <p class="page-subtitle">Inspect health status and response times</p>
                 </div>
                 <div class="page-actions">
                     <button class="btn btn-primary" id="btn-check-all-monitor">
@@ -328,7 +441,7 @@
                 <!-- Populated by JS -->
             </div>
             <div class="empty-state" id="monitor-empty" style="display:none;">
-                <i class="fas fa-radar"></i>
+                <i class="fas fa-satellite-dish"></i>
                 <p>No APIs to monitor</p>
                 <span>Add APIs from the API Management page first</span>
                 <button class="btn btn-outline" onclick="navigateTo('apis')">
@@ -342,7 +455,7 @@
             <div class="page-header">
                 <div>
                     <h2 class="page-title">Monitoring History</h2>
-                    <p class="page-subtitle">View past monitoring results</p>
+                    <p class="page-subtitle">View past health logs and performance records</p>
                 </div>
                 <div class="page-actions">
                     <div class="filter-group">
@@ -392,7 +505,7 @@
             <div class="page-header">
                 <div>
                     <h2 class="page-title">Performance Analytics</h2>
-                    <p class="page-subtitle">Analyze API performance metrics</p>
+                    <p class="page-subtitle">Comprehensive latency and uptime breakdown</p>
                 </div>
                 <div class="page-actions">
                     <select id="analytics-api-filter" class="filter-select">
@@ -404,7 +517,7 @@
             <!-- Analytics Stats -->
             <div class="analytics-stats-grid">
                 <div class="analytics-stat-card">
-                    <div class="analytics-stat-icon" style="--accent: #6366f1;">
+                    <div class="analytics-stat-icon" style="background: rgba(74, 108, 247, 0.12); color: #4a6cf7;">
                         <i class="fas fa-tachometer-alt"></i>
                     </div>
                     <div class="analytics-stat-info">
@@ -413,7 +526,7 @@
                     </div>
                 </div>
                 <div class="analytics-stat-card">
-                    <div class="analytics-stat-icon" style="--accent: #10b981;">
+                    <div class="analytics-stat-icon" style="background: rgba(34, 197, 94, 0.12); color: #22c55e;">
                         <i class="fas fa-check-double"></i>
                     </div>
                     <div class="analytics-stat-info">
@@ -422,7 +535,7 @@
                     </div>
                 </div>
                 <div class="analytics-stat-card">
-                    <div class="analytics-stat-icon" style="--accent: #ef4444;">
+                    <div class="analytics-stat-icon" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
                         <i class="fas fa-times-circle"></i>
                     </div>
                     <div class="analytics-stat-info">
@@ -431,7 +544,7 @@
                     </div>
                 </div>
                 <div class="analytics-stat-card">
-                    <div class="analytics-stat-icon" style="--accent: #f59e0b;">
+                    <div class="analytics-stat-icon" style="background: rgba(234, 179, 8, 0.12); color: #eab308;">
                         <i class="fas fa-hourglass-half"></i>
                     </div>
                     <div class="analytics-stat-info">
@@ -453,7 +566,7 @@
                 </div>
                 <div class="card chart-card-sm">
                     <div class="card-header">
-                        <h3><i class="fas fa-chart-doughnut"></i> Success vs Failed</h3>
+                        <h3><i class="fas fa-chart-pie"></i> Success vs Failed</h3>
                     </div>
                     <div class="card-body chart-body-centered">
                         <canvas id="success-fail-chart"></canvas>
