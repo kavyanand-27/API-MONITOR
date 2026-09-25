@@ -1,8 +1,3 @@
-/* ==========================================================================
-   API MONITOR — CONCISE APPLICATION LOGIC (Clean & Minimal)
-   ========================================================================== */
-
-// Mock Data
 let apiList = [
     { id: 1, name: 'JSONPlaceholder Users', url: 'https://jsonplaceholder.typicode.com/users', method: 'GET', category: 'Public API', calls: '23.4k', trend: '+8%', trendType: 'up', avatarColor: '#f59e0b', avatarIcon: 'fa-user', created_at: '2026-09-20 10:30:00', lastStatus: 'Healthy' },
     { id: 2, name: 'GitHub API Gateway', url: 'https://api.github.com', method: 'GET', category: 'Core Service', calls: '18.2k', trend: '+5%', trendType: 'up', avatarColor: '#e11d48', avatarIcon: 'fa-code-branch', created_at: '2026-09-21 14:15:00', lastStatus: 'Healthy' },
@@ -10,7 +5,6 @@ let apiList = [
     { id: 4, name: 'HTTPBin Ingestion Post', url: 'https://httpbin.org/post', method: 'POST', category: 'Ingestion', calls: '14.1k', trend: '+12%', trendType: 'up', avatarColor: '#0ea5e9', avatarIcon: 'fa-cloud-upload-alt', created_at: '2026-09-22 11:45:00', lastStatus: 'Healthy' },
     { id: 5, name: 'Legacy Billing Microservice', url: 'https://api.nonexistent-domain-xyz.com/data', method: 'GET', category: 'Payments', calls: '1.2k', trend: '-18%', trendType: 'down', avatarColor: '#f97316', avatarIcon: 'fa-exclamation-triangle', created_at: '2026-09-23 08:20:00', lastStatus: 'Failed' },
 ];
-
 let monitorHistory = [
     { id: 1, api_id: 1, api_name: 'JSONPlaceholder Users', status_code: 200, response_time: 142, status: 'Healthy', checked_at: '2026-09-25 09:30:00' },
     { id: 2, api_id: 2, api_name: 'GitHub API Gateway', status_code: 200, response_time: 289, status: 'Healthy', checked_at: '2026-09-25 09:30:05' },
@@ -23,15 +17,10 @@ let monitorHistory = [
     { id: 9, api_id: 4, api_name: 'HTTPBin Ingestion Post', status_code: 200, response_time: 410, status: 'Healthy', checked_at: '2026-09-25 08:00:15' },
     { id: 10, api_id: 5, api_name: 'Legacy Billing Microservice', status_code: 0, response_time: 0, status: 'Failed', checked_at: '2026-09-25 08:00:20' },
 ];
-
 let nextApiId = 6, nextHistoryId = 11, currentTab = 'activity', searchQuery = '', pendingDeleteId = null;
 let charts = { wave: null, donut: null, weekly: null, resp: null, dough: null, bar: null };
-
-// DOM Selectors Helper
 const $ = (id) => document.getElementById(id);
 const $$ = (sel) => document.querySelectorAll(sel);
-
-// Navigation
 function navigateTo(page) {
     if (!page) return;
     $$('.sidebar-nav .nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
@@ -42,7 +31,6 @@ function navigateTo(page) {
     $('sidebar-overlay')?.classList.remove('active');
     refreshPageData(page);
 }
-
 $$('.sidebar-nav .nav-link').forEach(link => {
     link.addEventListener('click', (e) => { if (link.dataset.page) { e.preventDefault(); navigateTo(link.dataset.page); } });
 });
@@ -52,14 +40,11 @@ $('btn-quick-new-api')?.addEventListener('click', () => { navigateTo('apis'); se
 $('mobile-check-all')?.addEventListener('click', checkAllAPIs);
 $('nav-btn-check-all')?.addEventListener('click', (e) => { e.preventDefault(); checkAllAPIs(); });
 $('btn-fullscreen-toggle')?.addEventListener('click', () => { !document.fullscreenElement ? document.documentElement.requestFullscreen().catch(()=>{}) : document.exitFullscreen().catch(()=>{}); });
-
-// Global Search & Tabs
 $('global-search-input')?.addEventListener('input', (e) => {
     searchQuery = e.target.value.toLowerCase().trim();
     renderActivityRows();
     renderAPITable();
 });
-
 $$('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         $$('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -68,8 +53,6 @@ $$('.tab-btn').forEach(btn => {
         renderActivityRows();
     });
 });
-
-// Dark/Light Theme
 function setTheme(isDark) {
     document.body.classList.toggle('dark-mode', isDark);
     const icon = isDark ? 'fa-sun' : 'fa-moon', oldIcon = isDark ? 'fa-moon' : 'fa-sun';
@@ -83,8 +66,6 @@ function setTheme(isDark) {
 $('theme-toggle')?.addEventListener('click', () => setTheme(!document.body.classList.contains('dark-mode')));
 $('mobile-theme-toggle')?.addEventListener('click', () => setTheme(!document.body.classList.contains('dark-mode')));
 if (localStorage.getItem('theme') === 'dark') setTheme(true);
-
-// Refresh Page Dispatcher
 function refreshPageData(page) {
     if (page === 'dashboard') {
         updateDashboardMetrics(); renderActivityRows();
@@ -99,8 +80,6 @@ function refreshPageData(page) {
         populateAnalyticsFilters(); updateAnalyticsStats(); renderAnalyticsCharts();
     }
 }
-
-// Dashboard Metrics
 function updateDashboardMetrics() {
     const total = apiList.length;
     const healthy = apiList.filter(a => a.lastStatus === 'Healthy').length;
@@ -109,7 +88,6 @@ function updateDashboardMetrics() {
     const valid = monitorHistory.filter(h => h.status !== 'Failed' && h.response_time > 0);
     const avg = valid.length ? Math.round(valid.reduce((s, h) => s + h.response_time, 0) / valid.length) : 142;
     const uptime = monitorHistory.length ? ((monitorHistory.filter(h => h.status !== 'Failed').length / monitorHistory.length) * 100).toFixed(1) : '99.8';
-
     if ($('hero-total-number')) $('hero-total-number').textContent = `${(total * 4.6).toFixed(4)}K`;
     const hPct = total ? Math.round((healthy / total) * 100) : 80;
     const sPct = total ? Math.round((slow / total) * 100) : 15;
@@ -129,8 +107,6 @@ function updateDashboardMetrics() {
     if ($('latency-progress-fill')) $('latency-progress-fill').style.width = `${Math.min(100, Math.round((avg / 600) * 100))}%`;
     if ($('uptime-progress-fill')) $('uptime-progress-fill').style.width = `${uptime}%`;
 }
-
-// Activity Rows
 function renderActivityRows() {
     const wrap = $('activity-rows-wrap');
     if (!wrap) return;
@@ -150,7 +126,6 @@ function renderActivityRows() {
     }
     if (searchQuery) list = list.filter(r => r.name.toLowerCase().includes(searchQuery) || r.url.toLowerCase().includes(searchQuery));
     if (!list.length) return wrap.innerHTML = `<div class="empty-state" style="padding:24px"><i class="fas fa-search"></i><p>No records found</p></div>`;
-
     wrap.innerHTML = list.map(item => `
         <div class="activity-row-item">
             <div class="row-left">
@@ -167,8 +142,6 @@ function renderActivityRows() {
         </div>
     `).join('');
 }
-
-// Charts
 function renderDashboardWaveChart() {
     const c = $('hero-wave-canvas');
     if (!c) return;
@@ -186,7 +159,6 @@ function renderDashboardWaveChart() {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
     });
 }
-
 function renderHealthDonutChart() {
     const c = $('health-donut-canvas');
     if (!c) return;
@@ -200,7 +172,6 @@ function renderHealthDonutChart() {
         options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } }
     });
 }
-
 function renderWeeklyBarsChart() {
     const c = $('weekly-bars-canvas');
     if (!c) return;
@@ -218,8 +189,6 @@ function renderWeeklyBarsChart() {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: isDark ? '#7d849b' : '#9599b0' } }, y: { display: false } } }
     });
 }
-
-// Check APIs Action
 function checkSingleAPI(apiId) {
     const api = apiList.find(a => a.id === apiId);
     if (!api) return;
@@ -234,7 +203,6 @@ function checkSingleAPI(apiId) {
         refreshPageData('dashboard'); renderAPITable(); renderMonitorCards();
     }, 450);
 }
-
 function checkAllAPIs() {
     if (!apiList.length) return showToast('info', 'Notice', 'No APIs registered.');
     showToast('info', 'Diagnostic Run', `Pinging ${apiList.length} APIs...`);
@@ -242,8 +210,6 @@ function checkAllAPIs() {
 }
 $('btn-check-all-dashboard')?.addEventListener('click', checkAllAPIs);
 $('btn-check-all-monitor')?.addEventListener('click', checkAllAPIs);
-
-// Add API Form
 $('api-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = $('api-name').value.trim(), url = $('api-url').value.trim(), method = $('api-method').value;
@@ -255,8 +221,6 @@ $('api-form')?.addEventListener('submit', (e) => {
     renderAPITable(); updateDashboardMetrics();
     setTimeout(() => checkSingleAPI(newApi.id), 250);
 });
-
-// Render Table, Monitor, History
 function renderAPITable() {
     const tbody = $('api-table-body'), count = $('api-count-badge');
     if (!tbody) return;
@@ -267,7 +231,6 @@ function renderAPITable() {
         <td><div class="action-btns"><button class="action-btn check" onclick="checkSingleAPI(${a.id})"><i class="fas fa-play"></i></button><button class="action-btn delete" onclick="confirmDeleteAPI(${a.id})"><i class="fas fa-trash-alt"></i></button></div></td></tr>
     `).join('');
 }
-
 function confirmDeleteAPI(id) {
     pendingDeleteId = id;
     $('modal-message').textContent = `Remove "${apiList.find(a=>a.id===id)?.name}"?`;
@@ -285,7 +248,6 @@ $('modal-confirm')?.addEventListener('click', () => {
 });
 $('modal-cancel')?.addEventListener('click', () => $('confirm-modal')?.classList.remove('active'));
 $('modal-close')?.addEventListener('click', () => $('confirm-modal')?.classList.remove('active'));
-
 function renderMonitorCards() {
     const g = $('monitor-grid');
     if (!g) return;
@@ -299,12 +261,10 @@ function renderMonitorCards() {
             </div>`;
     }).join('');
 }
-
 function populateHistoryFilters() {
     const f = $('history-api-filter');
     if (f) f.innerHTML = '<option value="all">All APIs</option>' + apiList.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
 }
-
 function renderHistoryTable() {
     const tbody = $('history-table-body'), apiF = $('history-api-filter')?.value || 'all', stF = $('history-status-filter')?.value || 'all';
     if (!tbody) return;
@@ -315,13 +275,10 @@ function renderHistoryTable() {
 }
 $('history-api-filter')?.addEventListener('change', renderHistoryTable);
 $('history-status-filter')?.addEventListener('change', renderHistoryTable);
-
-// Analytics
 function populateAnalyticsFilters() {
     const f = $('analytics-api-filter');
     if (f) f.innerHTML = '<option value="all">All APIs</option>' + apiList.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
 }
-
 function updateAnalyticsStats() {
     const f = $('analytics-api-filter')?.value || 'all';
     const d = f === 'all' ? monitorHistory : monitorHistory.filter(h => h.api_id.toString() === f);
@@ -331,7 +288,6 @@ function updateAnalyticsStats() {
     $('analytics-fail-count') && ($('analytics-fail-count').textContent = d.length - valid.length);
     $('analytics-slowest') && ($('analytics-slowest').textContent = `${valid.length ? Math.max(...valid.map(h => h.response_time)) : 0} ms`);
 }
-
 function renderAnalyticsCharts() {
     const isDark = document.body.classList.contains('dark-mode'), textColor = isDark ? '#9da4be' : '#575c75';
     const c1 = $('response-time-chart'), c2 = $('success-fail-chart'), c3 = $('api-comparison-chart');
@@ -349,8 +305,6 @@ function renderAnalyticsCharts() {
     }
 }
 $('analytics-api-filter')?.addEventListener('change', () => { updateAnalyticsStats(); renderAnalyticsCharts(); });
-
-// Utils
 function showToast(type, title, msg) {
     const t = document.createElement('div');
     t.className = `toast ${type}`;
@@ -358,10 +312,7 @@ function showToast(type, title, msg) {
     $('toast-container')?.appendChild(t);
     setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 250); }, 3000);
 }
-
 function escapeHtml(str) { return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
-
-// Init
 document.addEventListener('DOMContentLoaded', () => {
     refreshPageData('dashboard');
     renderAPITable();
