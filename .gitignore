@@ -12,3 +12,6 @@ desktop.ini
 
 # Environment
 .env
+
+# MS Office temporary lock files
+~$*
