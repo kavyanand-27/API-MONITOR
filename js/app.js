@@ -189,19 +189,31 @@ function renderWeeklyBarsChart() {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: isDark ? '#7d849b' : '#9599b0' } }, y: { display: false } } }
     });
 }
+function recordCheckResult(api, code, time, st) {
+    monitorHistory.unshift({ id: nextHistoryId++, api_id: api.id, api_name: api.name, status_code: code, response_time: time, status: st, checked_at: new Date().toISOString().slice(0, 19).replace('T', ' ') });
+    api.lastStatus = st;
+    showToast(st === 'Healthy' ? 'success' : (st === 'Slow' ? 'warning' : 'error'), `Status: ${st}`, `${api.name} responded in ${time}ms`);
+    refreshPageData('dashboard'); renderAPITable(); renderMonitorCards();
+}
 function checkSingleAPI(apiId) {
     const api = apiList.find(a => a.id === apiId);
     if (!api) return;
-    showToast('info', 'Pinging Endpoint', `Checking ${api.name}...`);
-    setTimeout(() => {
-        let code = 200, time = Math.round(Math.random() * 550 + 50), st = 'Healthy';
-        if (api.url.includes('nonexistent')) { code = 0; time = 0; st = 'Failed'; }
-        else if (time >= 500) st = 'Slow';
-        monitorHistory.unshift({ id: nextHistoryId++, api_id: api.id, api_name: api.name, status_code: code, response_time: time, status: st, checked_at: new Date().toISOString().slice(0, 19).replace('T', ' ') });
-        api.lastStatus = st;
-        showToast(st === 'Healthy' ? 'success' : (st === 'Slow' ? 'warning' : 'error'), `Status: ${st}`, `${api.name} responded in ${time}ms`);
-        refreshPageData('dashboard'); renderAPITable(); renderMonitorCards();
-    }, 450);
+    showToast('info', 'Pinging Endpoint', `Connecting to ${api.name}...`);
+    const t0 = performance.now();
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 5000);
+    fetch(api.url, { method: api.method || 'GET', signal: ctrl.signal, mode: 'no-cors' })
+        .then(res => {
+            clearTimeout(timer);
+            const time = Math.max(12, Math.round(performance.now() - t0));
+            const code = res.status || 200;
+            const st = time < 500 ? 'Healthy' : 'Slow';
+            recordCheckResult(api, code, time, st);
+        })
+        .catch(() => {
+            clearTimeout(timer);
+            recordCheckResult(api, 0, 0, 'Failed');
+        });
 }
 function checkAllAPIs() {
     if (!apiList.length) return showToast('info', 'Notice', 'No APIs registered.');
