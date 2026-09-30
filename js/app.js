@@ -195,10 +195,7 @@ function recordCheckResult(api, code, time, st) {
     showToast(st === 'Healthy' ? 'success' : (st === 'Slow' ? 'warning' : 'error'), `Status: ${st}`, `${api.name} responded in ${time}ms`);
     refreshPageData('dashboard'); renderAPITable(); renderMonitorCards();
 }
-function checkSingleAPI(apiId) {
-    const api = apiList.find(a => a.id === apiId);
-    if (!api) return;
-    showToast('info', 'Pinging Endpoint', `Connecting to ${api.name}...`);
+function runClientPing(api) {
     const t0 = performance.now();
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 5000);
@@ -215,6 +212,22 @@ function checkSingleAPI(apiId) {
             recordCheckResult(api, 0, 0, 'Failed');
         });
 }
+function checkSingleAPI(apiId) {
+    const api = apiList.find(a => a.id === apiId);
+    if (!api) return;
+    showToast('info', 'Pinging Endpoint', `Connecting to ${api.name}...`);
+    if (backendOnline) {
+        fetch(`backend/api.php?action=check_api&id=${api.id}`)
+            .then(res => res.json())
+            .then(json => {
+                if (json.success) recordCheckResult(api, json.check.status_code, json.check.response_time, json.check.status);
+                else runClientPing(api);
+            })
+            .catch(() => runClientPing(api));
+    } else {
+        runClientPing(api);
+    }
+}
 function checkAllAPIs() {
     if (!apiList.length) return showToast('info', 'Notice', 'No APIs registered.');
     showToast('info', 'Diagnostic Run', `Pinging ${apiList.length} APIs...`);
@@ -228,6 +241,13 @@ $('api-form')?.addEventListener('submit', (e) => {
     if (!name || !url) return showToast('error', 'Error', 'Name and URL are required.');
     const newApi = { id: nextApiId++, name, url, method, category: 'Custom API', calls: '1.0k', trend: '+1%', trendType: 'up', avatarColor: '#0ea5e9', avatarIcon: 'fa-cube', created_at: new Date().toISOString().slice(0, 10), lastStatus: 'Healthy' };
     apiList.push(newApi);
+    if (backendOnline) {
+        fetch('backend/api.php?action=add_api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, url, method })
+        }).catch(() => {});
+    }
     $('api-name').value = ''; $('api-url').value = '';
     showToast('success', 'Added', `"${name}" registered.`);
     renderAPITable(); updateDashboardMetrics();
@@ -250,6 +270,9 @@ function confirmDeleteAPI(id) {
 }
 $('modal-confirm')?.addEventListener('click', () => {
     if (pendingDeleteId !== null) {
+        if (backendOnline) {
+            fetch(`backend/api.php?action=delete_api&id=${pendingDeleteId}`, { method: 'POST' }).catch(() => {});
+        }
         apiList = apiList.filter(a => a.id !== pendingDeleteId);
         monitorHistory = monitorHistory.filter(h => h.api_id !== pendingDeleteId);
         pendingDeleteId = null;
@@ -325,8 +348,28 @@ function showToast(type, title, msg) {
     setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 250); }, 3000);
 }
 function escapeHtml(str) { return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
-document.addEventListener('DOMContentLoaded', () => {
+let backendOnline = false;
+async function initBackend() {
+    try {
+        const res = await fetch('backend/api.php?action=get_apis');
+        if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+                backendOnline = true;
+                apiList = json.data.map(a => ({
+                    id: parseInt(a.id),
+                    name: a.name,
+                    url: a.url,
+                    method: a.method,
+                    category: a.category || 'REST API',
+                    created_at: a.created_at,
+                    lastStatus: a.last_status || 'Pending'
+                }));
+            }
+        }
+    } catch (_) {}
     refreshPageData('dashboard');
     renderAPITable();
     renderMonitorCards();
-});
+}
+document.addEventListener('DOMContentLoaded', initBackend);
