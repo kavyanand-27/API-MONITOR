@@ -1,11 +1,15 @@
-let apiList = [
-    { id: 1, name: 'JSONPlaceholder Users', url: 'https://jsonplaceholder.typicode.com/users', method: 'GET', category: 'Public API', calls: '23.4k', trend: '+8%', trendType: 'up', avatarColor: '#f59e0b', avatarIcon: 'fa-user', created_at: '2026-09-20 10:30:00', lastStatus: 'Healthy' },
-    { id: 2, name: 'GitHub API Gateway', url: 'https://api.github.com', method: 'GET', category: 'Core Service', calls: '18.2k', trend: '+5%', trendType: 'up', avatarColor: '#e11d48', avatarIcon: 'fa-code-branch', created_at: '2026-09-21 14:15:00', lastStatus: 'Healthy' },
-    { id: 3, name: 'ReqRes Users & Auth', url: 'https://reqres.in/api/users', method: 'GET', category: 'Auth Service', calls: '9.6k', trend: '-4%', trendType: 'down', avatarColor: '#8b5cf6', avatarIcon: 'fa-shield-alt', created_at: '2026-09-22 09:00:00', lastStatus: 'Slow' },
-    { id: 4, name: 'HTTPBin Ingestion Post', url: 'https://httpbin.org/post', method: 'POST', category: 'Ingestion', calls: '14.1k', trend: '+12%', trendType: 'up', avatarColor: '#0ea5e9', avatarIcon: 'fa-cloud-upload-alt', created_at: '2026-09-22 11:45:00', lastStatus: 'Healthy' },
-    { id: 5, name: 'Legacy Billing Microservice', url: 'https://api.nonexistent-domain-xyz.com/data', method: 'GET', category: 'Payments', calls: '1.2k', trend: '-18%', trendType: 'down', avatarColor: '#f97316', avatarIcon: 'fa-exclamation-triangle', created_at: '2026-09-23 08:20:00', lastStatus: 'Failed' },
+const DB_APIS = 'api_monitor_endpoints';
+const DB_HIST = 'api_monitor_logs';
+
+const DEFAULT_APIS = [
+    { id: 1, name: 'JSONPlaceholder Users', url: 'https://jsonplaceholder.typicode.com/users', method: 'GET', category: 'Public API', calls: '23.4k', trend: '+8%', trendType: 'up', avatarColor: '#f59e0b', avatarIcon: 'fa-user', created_at: '2026-09-20', lastStatus: 'Healthy' },
+    { id: 2, name: 'GitHub API Gateway', url: 'https://api.github.com', method: 'GET', category: 'Core Service', calls: '18.2k', trend: '+5%', trendType: 'up', avatarColor: '#e11d48', avatarIcon: 'fa-code-branch', created_at: '2026-09-21', lastStatus: 'Healthy' },
+    { id: 3, name: 'ReqRes Users & Auth', url: 'https://reqres.in/api/users', method: 'GET', category: 'Auth Service', calls: '9.6k', trend: '-4%', trendType: 'down', avatarColor: '#8b5cf6', avatarIcon: 'fa-shield-alt', created_at: '2026-09-22', lastStatus: 'Slow' },
+    { id: 4, name: 'HTTPBin Ingestion Post', url: 'https://httpbin.org/post', method: 'POST', category: 'Ingestion', calls: '14.1k', trend: '+12%', trendType: 'up', avatarColor: '#0ea5e9', avatarIcon: 'fa-cloud-upload-alt', created_at: '2026-09-22', lastStatus: 'Healthy' },
+    { id: 5, name: 'Legacy Billing Microservice', url: 'https://api.nonexistent-domain-xyz.com/data', method: 'GET', category: 'Payments', calls: '1.2k', trend: '-18%', trendType: 'down', avatarColor: '#f97316', avatarIcon: 'fa-exclamation-triangle', created_at: '2026-09-23', lastStatus: 'Failed' },
 ];
-let monitorHistory = [
+
+const DEFAULT_HIST = [
     { id: 1, api_id: 1, api_name: 'JSONPlaceholder Users', status_code: 200, response_time: 142, status: 'Healthy', checked_at: '2026-09-25 09:30:00' },
     { id: 2, api_id: 2, api_name: 'GitHub API Gateway', status_code: 200, response_time: 289, status: 'Healthy', checked_at: '2026-09-25 09:30:05' },
     { id: 3, api_id: 3, api_name: 'ReqRes Users & Auth', status_code: 200, response_time: 823, status: 'Slow', checked_at: '2026-09-25 09:30:10' },
@@ -17,10 +21,33 @@ let monitorHistory = [
     { id: 9, api_id: 4, api_name: 'HTTPBin Ingestion Post', status_code: 200, response_time: 410, status: 'Healthy', checked_at: '2026-09-25 08:00:15' },
     { id: 10, api_id: 5, api_name: 'Legacy Billing Microservice', status_code: 0, response_time: 0, status: 'Failed', checked_at: '2026-09-25 08:00:20' },
 ];
-let nextApiId = 6, nextHistoryId = 11, currentTab = 'activity', searchQuery = '', pendingDeleteId = null;
+
+let apiList = [];
+let monitorHistory = [];
+
+function loadStorage() {
+    try {
+        const a = localStorage.getItem(DB_APIS);
+        apiList = a ? JSON.parse(a) : [...DEFAULT_APIS];
+    } catch (_) { apiList = [...DEFAULT_APIS]; }
+    try {
+        const h = localStorage.getItem(DB_HIST);
+        monitorHistory = h ? JSON.parse(h) : [...DEFAULT_HIST];
+    } catch (_) { monitorHistory = [...DEFAULT_HIST]; }
+}
+
+function saveStorage() {
+    try {
+        localStorage.setItem(DB_APIS, JSON.stringify(apiList));
+        localStorage.setItem(DB_HIST, JSON.stringify(monitorHistory));
+    } catch (_) {}
+}
+
+let nextApiId = Date.now(), nextHistoryId = Date.now() + 500, currentTab = 'activity', searchQuery = '', pendingDeleteId = null;
 let charts = { wave: null, donut: null, weekly: null, resp: null, dough: null, bar: null };
 const $ = (id) => document.getElementById(id);
 const $$ = (sel) => document.querySelectorAll(sel);
+
 function navigateTo(page) {
     if (!page) return;
     $$('.sidebar-nav .nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
@@ -31,6 +58,7 @@ function navigateTo(page) {
     $('sidebar-overlay')?.classList.remove('active');
     refreshPageData(page);
 }
+
 $$('.sidebar-nav .nav-link').forEach(link => {
     link.addEventListener('click', (e) => { if (link.dataset.page) { e.preventDefault(); navigateTo(link.dataset.page); } });
 });
@@ -40,11 +68,13 @@ $('btn-quick-new-api')?.addEventListener('click', () => { navigateTo('apis'); se
 $('mobile-check-all')?.addEventListener('click', checkAllAPIs);
 $('nav-btn-check-all')?.addEventListener('click', (e) => { e.preventDefault(); checkAllAPIs(); });
 $('btn-fullscreen-toggle')?.addEventListener('click', () => { !document.fullscreenElement ? document.documentElement.requestFullscreen().catch(()=>{}) : document.exitFullscreen().catch(()=>{}); });
+
 $('global-search-input')?.addEventListener('input', (e) => {
     searchQuery = e.target.value.toLowerCase().trim();
     renderActivityRows();
     renderAPITable();
 });
+
 $$('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         $$('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -53,6 +83,7 @@ $$('.tab-btn').forEach(btn => {
         renderActivityRows();
     });
 });
+
 function setTheme(isDark) {
     document.body.classList.toggle('dark-mode', isDark);
     const icon = isDark ? 'fa-sun' : 'fa-moon', oldIcon = isDark ? 'fa-moon' : 'fa-sun';
@@ -66,6 +97,7 @@ function setTheme(isDark) {
 $('theme-toggle')?.addEventListener('click', () => setTheme(!document.body.classList.contains('dark-mode')));
 $('mobile-theme-toggle')?.addEventListener('click', () => setTheme(!document.body.classList.contains('dark-mode')));
 if (localStorage.getItem('theme') === 'dark') setTheme(true);
+
 function refreshPageData(page) {
     if (page === 'dashboard') {
         updateDashboardMetrics(); renderActivityRows();
@@ -80,6 +112,7 @@ function refreshPageData(page) {
         populateAnalyticsFilters(); updateAnalyticsStats(); renderAnalyticsCharts();
     }
 }
+
 function updateDashboardMetrics() {
     const total = apiList.length;
     const healthy = apiList.filter(a => a.lastStatus === 'Healthy').length;
@@ -88,6 +121,7 @@ function updateDashboardMetrics() {
     const valid = monitorHistory.filter(h => h.status !== 'Failed' && h.response_time > 0);
     const avg = valid.length ? Math.round(valid.reduce((s, h) => s + h.response_time, 0) / valid.length) : 142;
     const uptime = monitorHistory.length ? ((monitorHistory.filter(h => h.status !== 'Failed').length / monitorHistory.length) * 100).toFixed(1) : '99.8';
+
     if ($('hero-total-number')) $('hero-total-number').textContent = `${(total * 4.6).toFixed(4)}K`;
     const hPct = total ? Math.round((healthy / total) * 100) : 80;
     const sPct = total ? Math.round((slow / total) * 100) : 15;
@@ -107,6 +141,7 @@ function updateDashboardMetrics() {
     if ($('latency-progress-fill')) $('latency-progress-fill').style.width = `${Math.min(100, Math.round((avg / 600) * 100))}%`;
     if ($('uptime-progress-fill')) $('uptime-progress-fill').style.width = `${uptime}%`;
 }
+
 function renderActivityRows() {
     const wrap = $('activity-rows-wrap');
     if (!wrap) return;
@@ -126,6 +161,7 @@ function renderActivityRows() {
     }
     if (searchQuery) list = list.filter(r => r.name.toLowerCase().includes(searchQuery) || r.url.toLowerCase().includes(searchQuery));
     if (!list.length) return wrap.innerHTML = `<div class="empty-state" style="padding:24px"><i class="fas fa-search"></i><p>No records found</p></div>`;
+
     wrap.innerHTML = list.map(item => `
         <div class="activity-row-item">
             <div class="row-left">
@@ -142,6 +178,7 @@ function renderActivityRows() {
         </div>
     `).join('');
 }
+
 function renderDashboardWaveChart() {
     const c = $('hero-wave-canvas');
     if (!c) return;
@@ -159,6 +196,7 @@ function renderDashboardWaveChart() {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
     });
 }
+
 function renderHealthDonutChart() {
     const c = $('health-donut-canvas');
     if (!c) return;
@@ -172,6 +210,7 @@ function renderHealthDonutChart() {
         options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false } } }
     });
 }
+
 function renderWeeklyBarsChart() {
     const c = $('weekly-bars-canvas');
     if (!c) return;
@@ -189,13 +228,19 @@ function renderWeeklyBarsChart() {
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: isDark ? '#7d849b' : '#9599b0' } }, y: { display: false } } }
     });
 }
+
 function recordCheckResult(api, code, time, st) {
     monitorHistory.unshift({ id: nextHistoryId++, api_id: api.id, api_name: api.name, status_code: code, response_time: time, status: st, checked_at: new Date().toISOString().slice(0, 19).replace('T', ' ') });
     api.lastStatus = st;
+    saveStorage();
     showToast(st === 'Healthy' ? 'success' : (st === 'Slow' ? 'warning' : 'error'), `Status: ${st}`, `${api.name} responded in ${time}ms`);
     refreshPageData('dashboard'); renderAPITable(); renderMonitorCards();
 }
-function runClientPing(api) {
+
+function checkSingleAPI(apiId) {
+    const api = apiList.find(a => a.id === apiId);
+    if (!api) return;
+    showToast('info', 'Pinging Endpoint', `Connecting to ${api.name}...`);
     const t0 = performance.now();
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 5000);
@@ -212,22 +257,7 @@ function runClientPing(api) {
             recordCheckResult(api, 0, 0, 'Failed');
         });
 }
-function checkSingleAPI(apiId) {
-    const api = apiList.find(a => a.id === apiId);
-    if (!api) return;
-    showToast('info', 'Pinging Endpoint', `Connecting to ${api.name}...`);
-    if (backendOnline) {
-        fetch(`backend/api.php?action=check_api&id=${api.id}`)
-            .then(res => res.json())
-            .then(json => {
-                if (json.success) recordCheckResult(api, json.check.status_code, json.check.response_time, json.check.status);
-                else runClientPing(api);
-            })
-            .catch(() => runClientPing(api));
-    } else {
-        runClientPing(api);
-    }
-}
+
 function checkAllAPIs() {
     if (!apiList.length) return showToast('info', 'Notice', 'No APIs registered.');
     showToast('info', 'Diagnostic Run', `Pinging ${apiList.length} APIs...`);
@@ -235,24 +265,20 @@ function checkAllAPIs() {
 }
 $('btn-check-all-dashboard')?.addEventListener('click', checkAllAPIs);
 $('btn-check-all-monitor')?.addEventListener('click', checkAllAPIs);
+
 $('api-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = $('api-name').value.trim(), url = $('api-url').value.trim(), method = $('api-method').value;
     if (!name || !url) return showToast('error', 'Error', 'Name and URL are required.');
     const newApi = { id: nextApiId++, name, url, method, category: 'Custom API', calls: '1.0k', trend: '+1%', trendType: 'up', avatarColor: '#0ea5e9', avatarIcon: 'fa-cube', created_at: new Date().toISOString().slice(0, 10), lastStatus: 'Healthy' };
     apiList.push(newApi);
-    if (backendOnline) {
-        fetch('backend/api.php?action=add_api', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, url, method })
-        }).catch(() => {});
-    }
+    saveStorage();
     $('api-name').value = ''; $('api-url').value = '';
     showToast('success', 'Added', `"${name}" registered.`);
     renderAPITable(); updateDashboardMetrics();
     setTimeout(() => checkSingleAPI(newApi.id), 250);
 });
+
 function renderAPITable() {
     const tbody = $('api-table-body'), count = $('api-count-badge');
     if (!tbody) return;
@@ -263,6 +289,7 @@ function renderAPITable() {
         <td><div class="action-btns"><button class="action-btn check" onclick="checkSingleAPI(${a.id})"><i class="fas fa-play"></i></button><button class="action-btn delete" onclick="confirmDeleteAPI(${a.id})"><i class="fas fa-trash-alt"></i></button></div></td></tr>
     `).join('');
 }
+
 function confirmDeleteAPI(id) {
     pendingDeleteId = id;
     $('modal-message').textContent = `Remove "${apiList.find(a=>a.id===id)?.name}"?`;
@@ -270,11 +297,9 @@ function confirmDeleteAPI(id) {
 }
 $('modal-confirm')?.addEventListener('click', () => {
     if (pendingDeleteId !== null) {
-        if (backendOnline) {
-            fetch(`backend/api.php?action=delete_api&id=${pendingDeleteId}`, { method: 'POST' }).catch(() => {});
-        }
         apiList = apiList.filter(a => a.id !== pendingDeleteId);
         monitorHistory = monitorHistory.filter(h => h.api_id !== pendingDeleteId);
+        saveStorage();
         pendingDeleteId = null;
         renderAPITable(); updateDashboardMetrics(); renderActivityRows();
         showToast('success', 'Deleted', 'API removed.');
@@ -283,6 +308,7 @@ $('modal-confirm')?.addEventListener('click', () => {
 });
 $('modal-cancel')?.addEventListener('click', () => $('confirm-modal')?.classList.remove('active'));
 $('modal-close')?.addEventListener('click', () => $('confirm-modal')?.classList.remove('active'));
+
 function renderMonitorCards() {
     const g = $('monitor-grid');
     if (!g) return;
@@ -296,10 +322,12 @@ function renderMonitorCards() {
             </div>`;
     }).join('');
 }
+
 function populateHistoryFilters() {
     const f = $('history-api-filter');
     if (f) f.innerHTML = '<option value="all">All APIs</option>' + apiList.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
 }
+
 function renderHistoryTable() {
     const tbody = $('history-table-body'), apiF = $('history-api-filter')?.value || 'all', stF = $('history-status-filter')?.value || 'all';
     if (!tbody) return;
@@ -310,10 +338,12 @@ function renderHistoryTable() {
 }
 $('history-api-filter')?.addEventListener('change', renderHistoryTable);
 $('history-status-filter')?.addEventListener('change', renderHistoryTable);
+
 function populateAnalyticsFilters() {
     const f = $('analytics-api-filter');
     if (f) f.innerHTML = '<option value="all">All APIs</option>' + apiList.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
 }
+
 function updateAnalyticsStats() {
     const f = $('analytics-api-filter')?.value || 'all';
     const d = f === 'all' ? monitorHistory : monitorHistory.filter(h => h.api_id.toString() === f);
@@ -323,6 +353,7 @@ function updateAnalyticsStats() {
     $('analytics-fail-count') && ($('analytics-fail-count').textContent = d.length - valid.length);
     $('analytics-slowest') && ($('analytics-slowest').textContent = `${valid.length ? Math.max(...valid.map(h => h.response_time)) : 0} ms`);
 }
+
 function renderAnalyticsCharts() {
     const isDark = document.body.classList.contains('dark-mode'), textColor = isDark ? '#9da4be' : '#575c75';
     const c1 = $('response-time-chart'), c2 = $('success-fail-chart'), c3 = $('api-comparison-chart');
@@ -340,6 +371,7 @@ function renderAnalyticsCharts() {
     }
 }
 $('analytics-api-filter')?.addEventListener('change', () => { updateAnalyticsStats(); renderAnalyticsCharts(); });
+
 function showToast(type, title, msg) {
     const t = document.createElement('div');
     t.className = `toast ${type}`;
@@ -347,29 +379,12 @@ function showToast(type, title, msg) {
     $('toast-container')?.appendChild(t);
     setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 250); }, 3000);
 }
+
 function escapeHtml(str) { return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
-let backendOnline = false;
-async function initBackend() {
-    try {
-        const res = await fetch('backend/api.php?action=get_apis');
-        if (res.ok) {
-            const json = await res.json();
-            if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-                backendOnline = true;
-                apiList = json.data.map(a => ({
-                    id: parseInt(a.id),
-                    name: a.name,
-                    url: a.url,
-                    method: a.method,
-                    category: a.category || 'REST API',
-                    created_at: a.created_at,
-                    lastStatus: a.last_status || 'Pending'
-                }));
-            }
-        }
-    } catch (_) {}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadStorage();
     refreshPageData('dashboard');
     renderAPITable();
     renderMonitorCards();
-}
-document.addEventListener('DOMContentLoaded', initBackend);
+});
