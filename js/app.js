@@ -527,7 +527,17 @@ function escapeHtml(str) { return (str || '').replace(/[&<>"']/g, m => ({ '&': '
 document.addEventListener('DOMContentLoaded', () => {
     loadStorage();
     updateAuthUI();
-    refreshPageData('dashboard');
-    renderAPITable();
-    renderMonitorCards();
+    const h = window.location.hash.replace('#', '');
+    if (['apis', 'monitor', 'history', 'analytics'].includes(h)) {
+        navigateTo(h);
+    } else {
+        refreshPageData('dashboard');
+        renderAPITable();
+        renderMonitorCards();
+    }
+    if (h === 'auth') openAuthModal('login');
+    if (h === 'analytics-open') {
+        navigateTo('analytics');
+        $('analytics-dropdown-wrap')?.classList.add('open');
+    }
 });
