@@ -217,6 +217,7 @@ set_cell_padding(c0, 22, 22, 50, 50); set_cell_padding(c1, 22, 22, 50, 50)
 toc_entries = [
     ("ABSTRACT", "iii"),
     ("LIST OF ABBREVIATIONS", "iv"),
+    ("LIST OF FIGURES", "v"),
     ("1. INTRODUCTION", "1"),
     ("2. LITERATURE SURVEY & COMPETITIVE BENCHMARK", "3"),
     ("3. SYSTEM ARCHITECTURE & DESIGN", "5"),
@@ -289,6 +290,64 @@ for ab, full in abbrevs:
         set_cell_padding(cell, 10, 10, 40, 40)
     r1 = c[0].paragraphs[0].add_run(ab); r1.font.name = "Times New Roman"; r1.bold = True; r1.font.size = Pt(9)
     r2 = c[1].paragraphs[0].add_run(full); r2.font.name = "Times New Roman"; r2.font.size = Pt(9)
+
+# ==============================================================================
+# LIST OF FIGURES (PAGE 5 - DEDICATED TABLE FORMAT - PRELIMINARY PAGE V)
+# ==============================================================================
+doc.add_page_break()
+
+p_lof_head = doc.add_paragraph()
+p_lof_head.alignment = WD_ALIGN_PARAGRAPH.CENTER
+p_lof_head.paragraph_format.space_before = Pt(8)
+p_lof_head.paragraph_format.space_after = Pt(8)
+r_lof = p_lof_head.add_run("LIST OF FIGURES")
+r_lof.font.name = "Times New Roman"; r_lof.font.size = Pt(14); r_lof.bold = True
+
+lof_t = doc.add_table(rows=1, cols=3)
+lof_t.alignment = WD_TABLE_ALIGNMENT.CENTER
+set_table_normal_black_borders(lof_t)
+
+c0 = lof_t.rows[0].cells[0]; c1 = lof_t.rows[0].cells[1]; c2 = lof_t.rows[0].cells[2]
+c0.width = Inches(1.5); c1.width = Inches(4.3); c2.width = Inches(0.9)
+r = c0.paragraphs[0].add_run("FIGURE NO."); r.bold = True; r.font.name = "Times New Roman"; r.font.size = Pt(10)
+r = c1.paragraphs[0].add_run("TITLE / DESCRIPTION"); r.bold = True; r.font.name = "Times New Roman"; r.font.size = Pt(10)
+r = c2.paragraphs[0].add_run("PAGE NO."); r.bold = True; r.font.name = "Times New Roman"; r.font.size = Pt(10); c2.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+set_cell_background(c0, "F1F5F9"); set_cell_background(c1, "F1F5F9"); set_cell_background(c2, "F1F5F9")
+set_cell_padding(c0, 20, 20, 45, 45); set_cell_padding(c1, 20, 20, 45, 45); set_cell_padding(c2, 20, 20, 45, 45)
+
+lof_entries = [
+    ("Figure 5.1", "Real-Time API Performance & Health Monitoring Dashboard", "10"),
+    ("Figure 5.2", "User Authentication Modal & Multi-Tenant Profile Popover", "11"),
+    ("Figure 5.3", "API Endpoint Registration & CRUD Management Interface", "12"),
+    ("Figure 5.4", "Live Diagnostic Monitor Cards with Real-Time Ping Actions", "13"),
+    ("Figure 5.5", "Diagnostic Audit History Logs and Query Filter System", "14"),
+    ("Figure 5.6", "Visual Performance Analytics Breakdown & Custom Glassmorphism Dropdown", "15"),
+    ("Figure 5.7", "Google Lighthouse Open-Source Audit & Core Web Vitals Benchmark", "16"),
+]
+
+for fig_no, title, pg in lof_entries:
+    row = lof_t.add_row()
+    c = row.cells
+    c[0].width = Inches(1.5); c[1].width = Inches(4.3); c[2].width = Inches(0.9)
+    for cell in c:
+        cell.paragraphs[0].paragraph_format.space_before = Pt(0)
+        cell.paragraphs[0].paragraph_format.space_after = Pt(0)
+        cell.paragraphs[0].paragraph_format.line_spacing = 1.15
+        set_cell_padding(cell, 14, 14, 42, 42)
+    r0 = c[0].paragraphs[0].add_run(fig_no); r0.font.name = "Times New Roman"; r0.font.size = Pt(9.5); r0.bold = True
+    r1 = c[1].paragraphs[0].add_run(title); r1.font.name = "Times New Roman"; r1.font.size = Pt(9.5)
+    r2 = c[2].paragraphs[0].add_run(pg); r2.font.name = "Times New Roman"; r2.font.size = Pt(9.5); r2.bold = True
+    c[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+p_lof_note = doc.add_paragraph()
+p_lof_note.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+p_lof_note.paragraph_format.space_before = Pt(14)
+p_lof_note.paragraph_format.line_spacing = 1.15
+r_note = p_lof_note.add_run("Note: The figures listed above depict empirical outputs, administrative interfaces, live diagnostic monitoring viewports, and automated verification suites captured from the production environment of the Real-Time API Performance Monitoring Dashboard.")
+r_note.font.name = "Times New Roman"
+r_note.font.size = Pt(10.5)
+r_note.italic = True
+
 
 # ==============================================================================
 # SECTION 2: CHAPTER 1: INTRODUCTION (PAGE NUMBER STARTS AT 1 - NORMAL FORMAT)
@@ -839,7 +898,7 @@ for ref_text in references_list:
     r.font.name = "Times New Roman"
     r.font.size = Pt(9.5)
 
-# Save output
-output_filename = "API_Monitoring_Project_Report.docx"
-doc.save(output_filename)
-print(f"Report successfully built: {output_filename}")
+# Save outputs
+doc.save("API_Monitoring_Project_Report.docx")
+doc.save("API_Monitoring_Project_Report(list of figures).docx")
+print("Report successfully built: API_Monitoring_Project_Report.docx and API_Monitoring_Project_Report(list of figures).docx")
