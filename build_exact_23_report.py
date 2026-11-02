@@ -66,16 +66,13 @@ for s in doc.sections:
         h_elm.remove(c)
     h_elm.append(parse_xml(r'<w:p %s/>' % nsdecls('w')))
 
-# Section 1 (Preliminary Pages: TOC, Figures, Abstract)
+# Section 1 (Preliminary Pages: Abstract, TOC, Figures & Abbreviations)
 s1 = doc.sections[1]
 s1.top_margin = Inches(1.0)
 s1.bottom_margin = Inches(1.0)
 s1.left_margin = Inches(1.2)
 s1.right_margin = Inches(1.0)
 s1.different_first_page_header_footer = False
-
-# Note: DO NOT add a page break here because paragraph 66 already has a section break
-# that starts Section 1 on Page 3!
 
 # ==============================================================================
 # STYLING HELPER FUNCTIONS
@@ -159,8 +156,27 @@ def add_bullet_justified(doc, title, desc, space_before=1, space_after=2.5):
     return p
 
 # ==============================================================================
-# TABLE OF CONTENTS (Page 3) - Normal black borders, 10pt font
+# 1. ABSTRACT (PAGE 3 - RIGHT AFTER BONAFIDE CERTIFICATE)
 # ==============================================================================
+add_inside_heading(doc, "1. ABSTRACT - SUMMARY OF APPLICATION DEVELOPMENT", space_before=4)
+
+add_body_p(doc, 
+    "In the contemporary landscape of microservices, cloud-native platforms, and distributed web architectures, application reliability is critically tethered to the availability, response speed, and error resilience of underlying Application Programming Interfaces (APIs). Modern web applications routinely rely upon dozens of heterogeneous external services—such as payment gateways, authentication providers, and third-party data pipelines. Unexpected latency degradation, silent endpoint terminations, and server outages directly compromise user retention, degrade operational throughput, and incur severe financial and technical debt. To address these systemic vulnerabilities, this project presents the design and implementation of an enterprise-grade, high-performance Real-Time API Performance Monitoring & Diagnostic Dashboard.")
+
+add_body_p(doc, 
+    "The application is engineered upon an innovative dual-mode operational architecture designed to maximize portability, deployment flexibility, and academic rigor. In its zero-setup client mode, the system functions as an entirely autonomous, zero-dependency platform capable of executing seamlessly in any modern web browser without requiring web server daemons, database runtimes, or software installations (such as XAMPP, Apache, or Node.js). Persistent state management is accomplished through the browser's Web Storage API (localStorage), while microsecond-accurate latency measurements are performed asynchronously using JavaScript's native Performance API (performance.now()) alongside AbortController-enforced timeout circuit breakers and CORS-resilient probing.")
+
+add_body_p(doc, 
+    "To satisfy rigorous enterprise criteria and university evaluation standards, the application further incorporates a fully decoupled relational server backend built using PHP (PHP Data Objects - PDO) and a normalized MySQL schema. The platform provides comprehensive multi-tenant isolation, ensuring that multiple authenticated developers (e.g., User 1 vs. User 2) retain strictly partitioned endpoint registries, isolated diagnostic histories, and customized visual analytics. Real-time data visualization is powered by six dynamic Chart.js canvas components, complemented by an adaptive dark/light glassmorphism user interface featuring custom acrylic dropdown components.")
+
+add_body_p(doc, 
+    "Rigorous empirical evaluation conducted using open-source audit tooling (Google Lighthouse) demonstrates outstanding performance, registering a 98/100 Performance Score, 100/100 Accessibility, 100/100 Best Practices, and 100/100 SEO, coupled with a sub-0.5 second First Contentful Paint (FCP) and zero millisecond Total Blocking Time (TBT). The resulting system establishes an extraordinarily portable, reliable, and aesthetically sophisticated diagnostic solution for developers, DevOps engineers, and system administrators.")
+
+# ==============================================================================
+# TABLE OF CONTENTS (PAGE 4 - FOLLOWED BY TABLE OF CONTENTS)
+# ==============================================================================
+doc.add_page_break()
+
 p_toc_head = doc.add_paragraph()
 p_toc_head.alignment = WD_ALIGN_PARAGRAPH.CENTER
 p_toc_head.paragraph_format.space_before = Pt(4)
@@ -181,7 +197,7 @@ for i, n in enumerate(["CHAPTER", "TITLE", "PAGE NO"]):
 toc_t.rows[0].cells[0].width = Inches(1.1); toc_t.rows[0].cells[1].width = Inches(4.7); toc_t.rows[0].cells[2].width = Inches(0.9)
 
 toc_entries = [
-    ("1", "ABSTRACT - SUMMARY OF APPLICATION DEVELOPMENT", "v"),
+    ("1", "ABSTRACT - SUMMARY OF APPLICATION DEVELOPMENT", "iii"),
     ("2", "INTRODUCTION: ABOUT PROJECT NEED AND PLANS", "1"),
     ("", "2.1 Project Need & Background", "1"),
     ("", "2.2 Problem Statement & Industry Challenges", "1"),
@@ -225,14 +241,14 @@ for ch, title, pg in toc_entries:
     p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
 # ==============================================================================
-# LIST OF FIGURES & LIST OF ABBREVIATIONS (Page 4)
+# LIST OF FIGURES & LIST OF ABBREVIATIONS (PAGE 5 - BOTH WITH TABLES)
 # ==============================================================================
 doc.add_page_break()
 
 p_lf_head = doc.add_paragraph()
 p_lf_head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p_lf_head.paragraph_format.space_before = Pt(4)
-p_lf_head.paragraph_format.space_after = Pt(8)
+p_lf_head.paragraph_format.space_before = Pt(2)
+p_lf_head.paragraph_format.space_after = Pt(4)
 r_lf = p_lf_head.add_run("LIST OF FIGURES")
 r_lf.font.name = "Times New Roman"; r_lf.font.size = Pt(14); r_lf.bold = True
 
@@ -242,10 +258,10 @@ set_table_normal_black_borders(fig_t)
 
 for i, n in enumerate(["FIGURE NO", "FIGURE NAME", "PAGE"]):
     c = fig_t.rows[0].cells[i]
-    r = c.paragraphs[0].add_run(n); r.bold = True; r.font.name = "Times New Roman"; r.font.size = Pt(11)
+    r = c.paragraphs[0].add_run(n); r.bold = True; r.font.name = "Times New Roman"; r.font.size = Pt(10.5)
     c.paragraphs[0].paragraph_format.space_before = Pt(0); c.paragraphs[0].paragraph_format.space_after = Pt(0)
     set_cell_background(c, "F1F5F9")
-    set_cell_padding(c, 45, 45, 80, 80)
+    set_cell_padding(c, 30, 30, 60, 60)
 fig_t.rows[0].cells[0].width = Inches(1.2); fig_t.rows[0].cells[1].width = Inches(4.6); fig_t.rows[0].cells[2].width = Inches(0.9)
 
 figures_data = [
@@ -264,26 +280,40 @@ for fno, ftitle, fpg in figures_data:
     for cell in c:
         cell.paragraphs[0].paragraph_format.space_before = Pt(0)
         cell.paragraphs[0].paragraph_format.space_after = Pt(0)
-        cell.paragraphs[0].paragraph_format.line_spacing = 1.15
-        set_cell_padding(cell, 20, 20, 60, 60)
+        cell.paragraphs[0].paragraph_format.line_spacing = 1.05
+        set_cell_padding(cell, 15, 15, 50, 50)
     c[0].paragraphs[0].add_run(fno).font.name = "Times New Roman"
+    c[0].paragraphs[0].runs[0].font.size = Pt(9.5)
     c[1].paragraphs[0].add_run(ftitle).font.name = "Times New Roman"
+    c[1].paragraphs[0].runs[0].font.size = Pt(9.5)
     p2 = c[2].paragraphs[0]; p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p2.add_run(fpg).font.name = "Times New Roman"
+    r_pg = p2.add_run(fpg); r_pg.font.name = "Times New Roman"; r_pg.font.size = Pt(9.5)
 
-# List of Abbreviations
+# List of Abbreviations - AS A PROPER TABLE WITH NORMAL BLACK BORDERS
 p_ab_head = doc.add_paragraph()
 p_ab_head.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p_ab_head.paragraph_format.space_before = Pt(14)
-p_ab_head.paragraph_format.space_after = Pt(6)
+p_ab_head.paragraph_format.space_before = Pt(6)
+p_ab_head.paragraph_format.space_after = Pt(4)
 r_ab = p_ab_head.add_run("LIST OF ABBREVIATIONS")
 r_ab.font.name = "Times New Roman"; r_ab.font.size = Pt(14); r_ab.bold = True
+
+abbrev_t = doc.add_table(rows=1, cols=2)
+abbrev_t.alignment = WD_TABLE_ALIGNMENT.CENTER
+set_table_normal_black_borders(abbrev_t)
+
+for i, n in enumerate(["ABBREVIATION", "EXPANSION / MEANING"]):
+    c = abbrev_t.rows[0].cells[i]
+    r = c.paragraphs[0].add_run(n); r.bold = True; r.font.name = "Times New Roman"; r.font.size = Pt(10.5)
+    c.paragraphs[0].paragraph_format.space_before = Pt(0); c.paragraphs[0].paragraph_format.space_after = Pt(0)
+    set_cell_background(c, "F1F5F9")
+    set_cell_padding(c, 30, 30, 60, 60)
+abbrev_t.rows[0].cells[0].width = Inches(2.0); abbrev_t.rows[0].cells[1].width = Inches(4.7)
 
 abbrevs = [
     ("API", "Application Programming Interface"),
     ("APM", "Application Performance Monitoring"),
     ("REST", "Representational State Transfer"),
-    ("HTTP / HTTPS", "HyperText Transfer Protocol / Secure"),
+    ("HTTP / HTTPS", "HyperText Transfer Protocol / HyperText Transfer Protocol Secure"),
     ("CRUD", "Create, Read, Update, Delete"),
     ("SPA", "Single Page Application"),
     ("CORS", "Cross-Origin Resource Sharing"),
@@ -296,32 +326,18 @@ abbrevs = [
     ("DOM", "Document Object Model"),
     ("DoS", "Denial of Service")
 ]
+
 for ab, full in abbrevs:
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p.paragraph_format.space_before = Pt(1); p.paragraph_format.space_after = Pt(2)
-    p.paragraph_format.line_spacing = 1.15
-    r1 = p.add_run(f"{ab:<16} : "); r1.font.name = "Times New Roman"; r1.bold = True; r1.font.size = Pt(10.5)
-    r2 = p.add_run(full); r2.font.name = "Times New Roman"; r2.font.size = Pt(10.5)
-
-# ==============================================================================
-# TOPIC 1: ABSTRACT (Page 5)
-# ==============================================================================
-doc.add_page_break()
-
-add_inside_heading(doc, "1. ABSTRACT - SUMMARY OF APPLICATION DEVELOPMENT", space_before=4)
-
-add_body_p(doc, 
-    "In the contemporary landscape of microservices, cloud-native platforms, and distributed web architectures, application reliability is critically tethered to the availability, response speed, and error resilience of underlying Application Programming Interfaces (APIs). Modern web applications routinely rely upon dozens of heterogeneous external services—such as payment gateways, authentication providers, and third-party data pipelines. Unexpected latency degradation, silent endpoint terminations, and server outages directly compromise user retention, degrade operational throughput, and incur severe financial and technical debt. To address these systemic vulnerabilities, this project presents the design and implementation of an enterprise-grade, high-performance Real-Time API Performance Monitoring & Diagnostic Dashboard.")
-
-add_body_p(doc, 
-    "The application is engineered upon an innovative dual-mode operational architecture designed to maximize portability, deployment flexibility, and academic rigor. In its zero-setup client mode, the system functions as an entirely autonomous, zero-dependency platform capable of executing seamlessly in any modern web browser without requiring web server daemons, database runtimes, or software installations (such as XAMPP, Apache, or Node.js). Persistent state management is accomplished through the browser's Web Storage API (localStorage), while microsecond-accurate latency measurements are performed asynchronously using JavaScript's native Performance API (performance.now()) alongside AbortController-enforced timeout circuit breakers and CORS-resilient probing.")
-
-add_body_p(doc, 
-    "To satisfy rigorous enterprise criteria and university evaluation standards, the application further incorporates a fully decoupled relational server backend built using PHP (PHP Data Objects - PDO) and a normalized MySQL schema. The platform provides comprehensive multi-tenant isolation, ensuring that multiple authenticated developers (e.g., User 1 vs. User 2) retain strictly partitioned endpoint registries, isolated diagnostic histories, and customized visual analytics. Real-time data visualization is powered by six dynamic Chart.js canvas components, complemented by an adaptive dark/light glassmorphism user interface featuring custom acrylic dropdown components.")
-
-add_body_p(doc, 
-    "Rigorous empirical evaluation conducted using open-source audit tooling (Google Lighthouse) demonstrates outstanding performance, registering a 98/100 Performance Score, 100/100 Accessibility, 100/100 Best Practices, and 100/100 SEO, coupled with a sub-0.5 second First Contentful Paint (FCP) and zero millisecond Total Blocking Time (TBT). The resulting system establishes an extraordinarily portable, reliable, and aesthetically sophisticated diagnostic solution for developers, DevOps engineers, and system administrators.")
+    row = abbrev_t.add_row()
+    c = row.cells
+    c[0].width = Inches(2.0); c[1].width = Inches(4.7)
+    for cell in c:
+        cell.paragraphs[0].paragraph_format.space_before = Pt(0)
+        cell.paragraphs[0].paragraph_format.space_after = Pt(0)
+        cell.paragraphs[0].paragraph_format.line_spacing = 1.05
+        set_cell_padding(cell, 12, 12, 45, 45)
+    r1 = c[0].paragraphs[0].add_run(ab); r1.font.name = "Times New Roman"; r1.bold = True; r1.font.size = Pt(9.5)
+    r2 = c[1].paragraphs[0].add_run(full); r2.font.name = "Times New Roman"; r2.font.size = Pt(9.5)
 
 # ==============================================================================
 # SECTION 2: TOPIC 2: INTRODUCTION (PAGE NUMBER STARTS AT 1 - NORMAL FORMAT)
